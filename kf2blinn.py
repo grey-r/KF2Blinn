@@ -8,9 +8,17 @@ except ImportError:
                 install it from http://pypi.python.org/pypi/Pillow
                 or run pip install Pillow.""")
 
-def exec(dif, mask, normal, spec):
-    wMax = max(dif.width, mask.width, normal.width, spec.width)
-    hMax = max(dif.height, mask.height, normal.height, spec.height)
+def exec(imageAr):
+    dif = imageAr[0]
+    mask = imageAr[1]
+    normal = imageAr[2]
+    spec = imageAr[3]
+
+    wMax = 0
+    hMax = 0
+    for im in imageAr:
+        wMax = max(im.width,wMax)
+        hMax = max(im.height,hMax)
 
     #do something
     print(str(wMax) + "/" + str(hMax))
@@ -20,4 +28,4 @@ m = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_M.tga")
 n = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_N.tga")
 s = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_S.tga")
 
-exec(d,m,n,s)
+exec([d,m,n,s])
