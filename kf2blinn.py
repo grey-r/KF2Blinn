@@ -9,8 +9,11 @@ except ImportError:
                 or run pip install Pillow.""")
 
 def exec(dif, mask, normal, spec):
+    wMax = max(dif.width, mask.width, normal.width, spec.width)
+    hMax = max(dif.height, mask.height, normal.height, spec.height)
+
     #do something
-    print("ree")
+    print(str(wMax) + "/" + str(hMax))
 
 d = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_D.tga")
 m = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_M.tga")
