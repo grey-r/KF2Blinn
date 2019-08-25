@@ -32,13 +32,17 @@ def exec(imageAr):
     maskSplit = mask.split()
     reflectivity = maskSplit[0]
     gloss = maskSplit[1]
-    ao = maskSplit[2]
+    ao = maskSplit[2]   
+    emissive = envRGBTMP=PIL.Image.new("L", (wMax,hMax), color=0)
+    if len(maskSplit)>3:
+        emissive=maskSplit[3]
 
     #composite final textures
 
 
     #diffuse=diffuse*ao
-    finalDiffuse = PIL.ImageChops.multiply(diffuse.convert(mode="RGB"),ao.convert(mode="RGB"))
+    finalDiffuse = PIL.ImageChops.multiply(diffuse.convert(mode="RGB"),ao.convert(mode="RGB")).convert(mode="RGBA")
+    finalDiffuse.putalpha(emissive)
     finalDiffuse.save("./dif.tga","TGA")
  
     #envMasks=spec*ao*reflectivity
@@ -72,9 +76,9 @@ def exec(imageAr):
 
 
 
-d = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_D.tga")
-m = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_M.tga")
-n = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_N.tga")
-s = Image.open("./samples/WEP_1P_MAC10_TEX/Texture2D/Wep_1stP_Mac10_S.tga")
+d = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_D.tga")
+m = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_M.tga")
+n = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_N.tga")
+s = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_S.tga")
 
 exec([d,m,n,s])
