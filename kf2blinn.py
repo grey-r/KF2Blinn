@@ -71,6 +71,10 @@ def exec(imageAr):
     finalNormal = normal.convert(mode="RGBA")
     finalNormal.putalpha(normalAlpha)
     finalNormal.save("./norm.tga","TGA")
+
+    #spec = spec???? lol
+    finalSpec = specular.convert(mode="RGB")
+    finalSpec.save("./spec.tga","TGA")
     
 
 
