@@ -1,4 +1,4 @@
-import sys
+import sys, os.path
 
 try:
     import PIL
@@ -8,7 +8,12 @@ except ImportError:
                 install it from http://pypi.python.org/pypi/Pillow
                 or run pip install Pillow.""")
 
-def exec(imageAr):
+def exec5Stack(imageAr,outDir="./"):
+    #prepare output directory
+    finalOutDir = os.path.join(outDir,"out/")
+    if not os.path.exists(finalOutDir):
+        os.makedirs(finalOutDir)
+
     #get maximum sizes
     wMax = 0
     hMax = 0
@@ -43,7 +48,7 @@ def exec(imageAr):
     #diffuse=diffuse*ao
     finalDiffuse = PIL.ImageChops.multiply(diffuse.convert(mode="RGB"),ao.convert(mode="RGB")).convert(mode="RGBA")
     finalDiffuse.putalpha(emissive)
-    finalDiffuse.save("./dif.tga","TGA")
+    finalDiffuse.save(os.path.join(outDir,"out/dif.tga"),"TGA")
  
     #envMasks=spec*spec*ao*reflectivity
     env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),specular.convert(mode="RGB"))
@@ -58,37 +63,76 @@ def exec(imageAr):
     envRGBTMP=Image.new("RGBA", (wMax,hMax), color=0)
     #r
     envRGBTMP.putalpha(envRed)
-    envRGBTMP.save("./env_r.tga","TGA")
+    envRGBTMP.save(os.path.join(outDir,"out/env_r.tga"),"TGA")
     #g
     envRGBTMP.putalpha(envGreen)
-    envRGBTMP.save("./env_g.tga","TGA")
+    envRGBTMP.save(os.path.join(outDir,"out/env_g.tga"),"TGA")
     #b
     envRGBTMP.putalpha(envBlue)
-    envRGBTMP.save("./env_b.tga","TGA")
+    envRGBTMP.save(os.path.join(outDir,"out/env_b.tga"),"TGA")
 
     #normals
     #normal alpha = gloss*reflectivity - used for fresnel
     normalAlpha = PIL.ImageChops.multiply(reflectivity,gloss).convert(mode="L")
     finalNormal = normal.convert(mode="RGBA")
     finalNormal.putalpha(normalAlpha)
-    finalNormal.save("./norm.tga","TGA")
+    finalNormal.save(os.path.join(outDir,"out/norm.tga"),"TGA")
 
     #spec = spec???? lol
     finalSpec = specular.convert(mode="RGB")
-    finalSpec.save("./spec.tga","TGA")
+    finalSpec.save(os.path.join(outDir,"out/spec.tga"),"TGA")
 
     #mask
     white = Image.new("L", (wMax,hMax), color="white")
     finalMask = Image.merge("RGB", (PIL.ImageChops.multiply(gloss,gloss),white,white))
-    finalMask.save("./mask.tga","TGA")
+    finalMask.save(os.path.join(outDir,"out/mask.tga"),"TGA")
     
 
+if __name__ == "__main__":
+    maskPath = ""
+    specPath = ""
+    nrmPath = ""
 
+    m=None
+    n=None
+    s=None
 
-
-d = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_D.tga")
-m = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_M.tga")
-n = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_N.tga")
-s = Image.open("./samples/WEP_1P_Winchester_TEX/Texture2D/Wep_1stP_Winchester_S.tga")
-
-exec([d,m,n,s])
+    args = sys.argv
+    baseDiffusePath = None
+    if len(args)>=2:
+        baseDiffusePath=args[1]
+    else:
+        print("Input your diffuse texture path.")
+        baseDiffusePath=input()
+        if baseDiffusePath.startswith("\""):
+            baseDiffusePath=baseDiffusePath[1:]
+        if baseDiffusePath.endswith("\""):
+            baseDiffusePath=baseDiffusePath[0:-1]
+    if not os.path.isfile(baseDiffusePath):
+        exit("THATS NO FILE")
+    directory = os.path.dirname(baseDiffusePath)
+    base=os.path.basename(baseDiffusePath)
+    baseDecomp=os.path.splitext(base)
+    if baseDecomp[0].lower().endswith("_d"):
+        baseFN = baseDecomp[0][0:-2]
+        maskPath = os.path.join(directory,baseFN+"_M"+baseDecomp[1])
+        specPath = os.path.join(directory,baseFN+"_S"+baseDecomp[1])
+        nrmPath = os.path.join(directory,baseFN+"_N"+baseDecomp[1])
+    
+    d = Image.open(baseDiffusePath)
+    if os.path.isfile(maskPath):
+        m=Image.open(maskPath)
+    else:
+        print("WARNING: MISSING MASK")
+        m=Image.new("RGB", (512,512), color=(192,64,255))
+    if os.path.isfile(specPath):
+        s=Image.open(specPath)
+    else:
+        print("WARNING: MISSING SPECULAR")
+        s=Image.new("RGB", (512,512), color=(64,64,64))
+    if os.path.isfile(nrmPath):
+        n=Image.open(nrmPath)
+    else:
+        print("WARNING: MISSING NORMALS")
+        n=Image.new("RGB", (512,512), color=(128,128,255))
+    exec5Stack([d,m,n,s],outDir=directory)
