@@ -73,7 +73,9 @@ def exec(imageAr):
     finalNormal.save("./norm.tga","TGA")
 
     #spec = spec???? lol
-    finalSpec = specular.convert(mode="RGB")
+    finalSpec = specular.convert(mode="RGBA")
+    blankAlpha=PIL.Image.new("L", (wMax,hMax), color=0)
+    finalSpec.putalpha(blankAlpha)
     finalSpec.save("./spec.tga","TGA")
     
 
