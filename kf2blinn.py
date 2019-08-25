@@ -27,8 +27,39 @@ def exec(imageAr):
     normal = imageAr[2]
     specular = imageAr[3]
 
+    #split mask into components
     maskSplit = mask.split()
-    print(len(maskSplit))
+    reflectivity = maskSplit[0]
+    gloss = maskSplit[1]
+    ao = maskSplit[2]
+
+    #composite final textures
+
+
+    #diffuse=diffuse*ao
+    finalDiffuse = PIL.ImageChops.multiply(diffuse.convert(mode="RGB"),ao.convert(mode="RGB"))
+    finalDiffuse.save("./dif.tga","TGA")
+
+    #envMasks=spec*ao*reflectivity
+    env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),ao.convert(mode="RGB"))
+    env = PIL.ImageChops.multiply(env,reflectivity.convert(mode="RGB"))
+    #split env into channels
+    envSplit = env.split()
+    envRed = envSplit[0]
+    envGreen = envSplit[1]
+    envBlue = envSplit[2]
+    #save each env channel as rgba
+    envRGBTMP=PIL.Image.new("RGBA", (wMax,hMax), color=0)
+    #r
+    envRGBTMP.putalpha(envRed)
+    envRGBTMP.save("./env_r.tga","TGA")
+    #g
+    envRGBTMP.putalpha(envGreen)
+    envRGBTMP.save("./env_g.tga","TGA")
+    #b
+    envRGBTMP.putalpha(envBlue)
+    envRGBTMP.save("./env_b.tga","TGA")
+
 
 
 
