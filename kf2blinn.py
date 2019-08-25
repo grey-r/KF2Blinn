@@ -33,7 +33,7 @@ def exec(imageAr):
     reflectivity = maskSplit[0]
     gloss = maskSplit[1]
     ao = maskSplit[2]   
-    emissive = envRGBTMP=PIL.Image.new("L", (wMax,hMax), color=0)
+    emissive = envRGBTMP=Image.new("L", (wMax,hMax), color=0)
     if len(maskSplit)>3:
         emissive=maskSplit[3]
 
@@ -45,8 +45,9 @@ def exec(imageAr):
     finalDiffuse.putalpha(emissive)
     finalDiffuse.save("./dif.tga","TGA")
  
-    #envMasks=spec*ao*reflectivity
-    env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),ao.convert(mode="RGB"))
+    #envMasks=spec*spec*ao*reflectivity
+    env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),specular.convert(mode="RGB"))
+    env = PIL.ImageChops.multiply(env,ao.convert(mode="RGB"))
     env = PIL.ImageChops.multiply(env,reflectivity.convert(mode="RGB"))
     #split env into channels
     envSplit = env.split()
@@ -54,7 +55,7 @@ def exec(imageAr):
     envGreen = envSplit[1]
     envBlue = envSplit[2]
     #save each env channel as rgba
-    envRGBTMP=PIL.Image.new("RGBA", (wMax,hMax), color=0)
+    envRGBTMP=Image.new("RGBA", (wMax,hMax), color=0)
     #r
     envRGBTMP.putalpha(envRed)
     envRGBTMP.save("./env_r.tga","TGA")
@@ -75,6 +76,11 @@ def exec(imageAr):
     #spec = spec???? lol
     finalSpec = specular.convert(mode="RGB")
     finalSpec.save("./spec.tga","TGA")
+
+    #mask
+    white = Image.new("L", (wMax,hMax), color="white")
+    finalMask = Image.merge("RGB", (PIL.ImageChops.multiply(gloss,gloss),white,white))
+    finalMask.save("./mask.tga","TGA")
     
 
 
