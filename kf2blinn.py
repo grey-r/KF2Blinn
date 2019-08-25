@@ -17,9 +17,10 @@ def exec(imageAr):
         hMax = max(im.height,hMax)
     
     #scale all to maximum size
-    for im in imageAr:
+    for k in range(len(imageAr)):
+        im = imageAr[k]
         if (im.width<wMax or im.height<hMax):
-            im.resize((wMax,hMax), resample = PIL.Image.LANCZOS)
+            imageAr[k] = im.resize((wMax,hMax), resample = PIL.Image.LANCZOS)
     
     #extract channels
     diffuse = imageAr[0]
@@ -60,6 +61,13 @@ def exec(imageAr):
     envRGBTMP.putalpha(envBlue)
     envRGBTMP.save("./env_b.tga","TGA")
 
+    #normals
+    #normal alpha = gloss*reflectivity - used for fresnel
+    normalAlpha = PIL.ImageChops.multiply(reflectivity,gloss).convert(mode="L")
+    finalNormal = normal.convert(mode="RGBA")
+    finalNormal.putalpha(normalAlpha)
+    finalNormal.save("./norm.tga","TGA")
+    
 
 
 
