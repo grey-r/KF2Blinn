@@ -39,7 +39,7 @@ def exec(imageAr):
     #diffuse=diffuse*ao
     finalDiffuse = PIL.ImageChops.multiply(diffuse.convert(mode="RGB"),ao.convert(mode="RGB"))
     finalDiffuse.save("./dif.tga","TGA")
-
+ 
     #envMasks=spec*ao*reflectivity
     env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),ao.convert(mode="RGB"))
     env = PIL.ImageChops.multiply(env,reflectivity.convert(mode="RGB"))
