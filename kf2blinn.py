@@ -104,9 +104,9 @@ if __name__ == "__main__":
     else:
         print("Input your diffuse texture path.")
         baseDiffusePath=input()
-        if baseDiffusePath.startswith("\""):
+        if baseDiffusePath.startswith("\"") or baseDiffusePath.startswith("'"):
             baseDiffusePath=baseDiffusePath[1:]
-        if baseDiffusePath.endswith("\""):
+        if baseDiffusePath.endswith("\"") or baseDiffusePath.endswith("'"):
             baseDiffusePath=baseDiffusePath[0:-1]
     if not os.path.isfile(baseDiffusePath):
         exit("THATS NO FILE")
