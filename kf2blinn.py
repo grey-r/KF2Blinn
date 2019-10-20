@@ -7,6 +7,12 @@ except ImportError:
     sys.exit("""You need PIL!
                 install it from http://pypi.python.org/pypi/Pillow
                 or run pip install Pillow.""")
+try:
+    import numpy as np
+except ImportError:
+    sys.exit("""You need numpy!
+                install it from https://pypi.org/project/numpy/
+                or run pip install numpy.""")
 
 def exec5Stack(imageAr,outDir="./"):
     #prepare output directory
@@ -41,6 +47,14 @@ def exec5Stack(imageAr,outDir="./"):
     emissive = envRGBTMP=Image.new("L", (wMax,hMax), color=0)
     if len(maskSplit)>3:
         emissive=maskSplit[3]
+
+    #fix reflectivity
+
+    avgRef=np.mean(np.asarray(reflectivity))
+    print("Average reflectivity: " + str(avgRef))
+    if (avgRef<1):
+        print("Reflectivity unexpectedly low! Patching to 128/256")
+        reflectivity = Image.new("L", (wMax,hMax), color=128)
 
     #composite final textures
 
