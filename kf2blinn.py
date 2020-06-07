@@ -7,12 +7,6 @@ except ImportError:
     sys.exit("""You need PIL!
                 install it from http://pypi.python.org/pypi/Pillow
                 or run pip install Pillow.""")
-try:
-    import numpy as np
-except ImportError:
-    sys.exit("""You need numpy!
-                install it from https://pypi.org/project/numpy/
-                or run pip install numpy.""")
 
 def exec5Stack(imageAr,outDir="./"):
     #prepare output directory
@@ -41,20 +35,12 @@ def exec5Stack(imageAr,outDir="./"):
 
     #split mask into components
     maskSplit = mask.split()
-    reflectivity = maskSplit[0]
+    bloodMask = maskSplit[0] # unused
     gloss = maskSplit[1]
     ao = maskSplit[2]   
     emissive = envRGBTMP=Image.new("L", (wMax,hMax), color=0)
     if len(maskSplit)>3:
         emissive=maskSplit[3]
-
-    #fix reflectivity
-
-    avgRef=np.mean(np.asarray(reflectivity))
-    print("Average reflectivity: " + str(avgRef))
-    if (avgRef<1):
-        print("Reflectivity unexpectedly low! Patching to 128/256")
-        reflectivity = Image.new("L", (wMax,hMax), color=128)
 
     #composite final textures
 
@@ -64,10 +50,9 @@ def exec5Stack(imageAr,outDir="./"):
     finalDiffuse.putalpha(emissive)
     finalDiffuse.save(os.path.join(outDir,"out/dif.tga"),"TGA")
  
-    #envMasks=spec*spec*ao*reflectivity
+    #envMasks=spec*spec*ao
     env = PIL.ImageChops.multiply(specular.convert(mode="RGB"),specular.convert(mode="RGB"))
     env = PIL.ImageChops.multiply(env,ao.convert(mode="RGB"))
-    env = PIL.ImageChops.multiply(env,reflectivity.convert(mode="RGB"))
     #split env into channels
     envSplit = env.split()
     envRed = envSplit[0]
@@ -86,8 +71,8 @@ def exec5Stack(imageAr,outDir="./"):
     envRGBTMP.save(os.path.join(outDir,"out/env_b.tga"),"TGA")
 
     #normals
-    #normal alpha = gloss*reflectivity - used for fresnel
-    normalAlpha = PIL.ImageChops.multiply(reflectivity,gloss).convert(mode="L")
+    #normal alpha = gloss - used for fresnel
+    normalAlpha = gloss.convert(mode="L")
     finalNormal = normal.convert(mode="RGBA")
     finalNormal.putalpha(normalAlpha)
     finalNormal.save(os.path.join(outDir,"out/norm.tga"),"TGA")
